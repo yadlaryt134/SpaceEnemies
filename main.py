@@ -1,8 +1,10 @@
 
+from re import S
 import pygame
 from assets import Player
 from assets import Bullet
 from assets import Enemy
+import random
 
 pygame.init()
 
@@ -30,8 +32,13 @@ player = Player(start_x, start_y, playerimg)
 enemy_start_x = 0
 enemy_start_y = 20
 
+num_of_enemies = 6
+enemy_obj_list = []
+
 # Enemy
-enemy = Enemy(enemyimg, enemy_start_x, enemy_start_y)
+for i in range(num_of_enemies):
+
+    enemy_obj_list.append(Enemy(screen, enemyimg, random.randint(0,735), random.randint(50,150)))
 
 playerX = start_x
 playerY = start_y
@@ -44,10 +51,10 @@ player_y_change = 0
 
 # Bullet
 bullet = Bullet()
-bullet.bulletY = start_x
+bullet.bulletY = start_y
+bullet.bulletX = start_x 
 
 while running:
-
 
     screen.blit(background, (0,0))
 
@@ -65,14 +72,17 @@ while running:
             if event.key == pygame.K_DOWN:
                 player_y_change = player.player_y_change
             if event.key == pygame.K_SPACE:
-                bullet.fire_bullet(screen, playerX, bullet.bulletY, bulletimg)
+                bullet.bulletX = playerX
+                bullet.bulletY = playerY
+                bullet.fire_bullet(screen,  playerX, playerY, bulletimg)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_DOWN or event.key == pygame.K_UP:
                 player_x_change = 0
                 player_y_change = 0
 
     if bullet.bulletY <= 0:
-        bullet.bulletY = start_x
+        bullet.bulletX = playerX
+        bullet.bulletY = playerY
         bullet.bullet_state = False
 
     if bullet.bullet_state:
@@ -83,6 +93,11 @@ while running:
     playerX += player_x_change
 
     player.draw(screen, playerX, playerY)
-    enemy.draw(screen, enemy_start_x, enemy_start_y)
+
+    for i in range(num_of_enemies):
+
+        enemy_obj_list[i].draw()
+        enemy_obj_list[i].movement()
+        
 
     pygame.display.update()
