@@ -4,7 +4,9 @@ import pygame
 from assets import Player
 from assets import Bullet
 from assets import Enemy
+from assets import Display
 import random
+import math
 
 pygame.init()
 
@@ -32,12 +34,15 @@ player = Player(start_x, start_y, playerimg)
 enemy_start_x = 0
 enemy_start_y = 20
 
+# for another group of enemies, make another group of 6
 num_of_enemies = 6
+grand_num_of_enemies = num_of_enemies
 enemy_obj_list = []
 
 # Enemy
 for i in range(num_of_enemies):
 
+    # don't have the enemies near each other
     enemy_obj_list.append(Enemy(screen, enemyimg, random.randint(0,735), random.randint(50,150)))
 
 playerX = start_x
@@ -54,6 +59,10 @@ bullet = Bullet()
 bullet.bulletY = start_y
 bullet.bulletX = start_x 
 
+# Display
+
+display = Display(screen)
+count = 0
 while running:
 
     screen.blit(background, (0,0))
@@ -75,6 +84,7 @@ while running:
                 bullet.bulletX = playerX
                 bullet.bulletY = playerY
                 bullet.fire_bullet(screen,  playerX, playerY, bulletimg)
+                bullet.fired = True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_DOWN or event.key == pygame.K_UP:
                 player_x_change = 0
@@ -94,10 +104,33 @@ while running:
 
     player.draw(screen, playerX, playerY)
 
-    for i in range(num_of_enemies):
+    while count < num_of_enemies:
 
-        enemy_obj_list[i].draw()
-        enemy_obj_list[i].movement()
-        
+        enemyY = enemy_obj_list[count].enemyY
+        enemyX = enemy_obj_list[count].enemyX
 
+        if bullet.fired:
+            collision = bullet.collision(enemyX, enemyY, bullet.bulletX, bullet.bulletY)
+
+            if collision:
+                bullet.fired = False
+                collision = False
+                if display.score_value <= grand_num_of_enemies-1:
+                    display.score_value += 1
+                enemy_obj_list[count].alive = False
+
+        enemy_obj_list[count].draw()
+        enemy_obj_list[count].movement()
+
+        if enemy_obj_list[count].alive == False:
+            enemy_obj_list.pop(count)
+            num_of_enemies -= 1
+            count = 0
+        else:
+            count += 1
+       
+    count = 0
+
+
+    display.show_score()
     pygame.display.update()
