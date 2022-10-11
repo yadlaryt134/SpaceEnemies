@@ -131,6 +131,8 @@ while running:
        
     count = 0
 
+    if not enemy_obj_list:
+        display.game_over_text()
 
     display.show_score()
     pygame.display.update()

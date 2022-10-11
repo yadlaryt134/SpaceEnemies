@@ -86,6 +86,13 @@ class Display:
         score = font.render("Score: " + str(self.score_value), True, (255,255,255))
         self.screen.blit(score, (self.textX,self.textY))
 
+    def game_over_text(self):
+
+        font = pygame.font.Font('freesansbold.ttf', 64)
+
+        game_over = font.render("GAME OVER", True, (255,255,255))
+        self.screen.blit(game_over, (200, 270))
+
 # class Powerups:
 
 
