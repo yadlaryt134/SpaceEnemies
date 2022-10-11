@@ -93,7 +93,37 @@ class Display:
         game_over = font.render("GAME OVER", True, (255,255,255))
         self.screen.blit(game_over, (200, 270))
 
-# class Powerups:
+class Powerups:
+
+    def __init__(self, screen, image):
+
+        self.screen = screen
+        self.image = image
+        self.fast_player_x =  random.randint(0,735)
+        self.fast_player_y = random.randint(50,150)
+        self.fast_player_y_change = 0.3
+    
+    def respawn_fast_powerup(self):
+        self.fast_player_x =  random.randint(0,735)
+        self.fast_player_y = random.randint(50,150)
+
+    def spawn_fast_powerup(self):
+
+        self.fast_player_y += self.fast_player_y_change
+
+        self.screen.blit(self.image, (self.fast_player_x, self.fast_player_y))
+
+    def fast_powerup(self, playerX, playerY):
+
+        distance = math.sqrt(math.pow(playerX-self.fast_player_x,2) + (math.pow(playerY-self.fast_player_y,2)))
+
+        if distance < 18:
+            return True
+        else:
+            return False
+
+        
+        
 
 
         

@@ -1,10 +1,12 @@
 
+from distutils.spawn import spawn
 from re import S
 import pygame
 from assets import Player
 from assets import Bullet
 from assets import Enemy
 from assets import Display
+from assets import Powerups
 import random
 import math
 
@@ -18,7 +20,13 @@ playerimg = pygame.image.load("images/spaceship.png")
 bulletimg = pygame.image.load("images/bullet.png")
 
 enemyimg = pygame.image.load("images/enemy.png")
+
 enemyimg = pygame.transform.scale(enemyimg, (50,50))
+
+fast_powerup_img = pygame.image.load("images/flash.png")
+
+fast_powerup_img = pygame.transform.scale(fast_powerup_img, (50,50))
+
 
 screen = pygame.display.set_mode((800,600))
 
@@ -39,11 +47,16 @@ num_of_enemies = 6
 grand_num_of_enemies = num_of_enemies
 enemy_obj_list = []
 
-# Enemy
-for i in range(num_of_enemies):
+def spawn_enemies():
 
-    # don't have the enemies near each other
-    enemy_obj_list.append(Enemy(screen, enemyimg, random.randint(0,735), random.randint(50,150)))
+    # Enemy
+    for i in range(num_of_enemies):
+
+        # don't have the enemies near each other
+        enemy_obj_list.append(Enemy(screen, enemyimg, random.randint(0,735), random.randint(50,150)))
+
+spawn_enemies()
+spawn_count = 0
 
 playerX = start_x
 playerY = start_y
@@ -63,6 +76,12 @@ bullet.bulletX = start_x
 
 display = Display(screen)
 count = 0
+
+# Powerups
+
+powerup = Powerups(screen, fast_powerup_img)
+fast_powerup = False
+
 while running:
 
     screen.blit(background, (0,0))
@@ -115,8 +134,8 @@ while running:
             if collision:
                 bullet.fired = False
                 collision = False
-                if display.score_value <= grand_num_of_enemies-1:
-                    display.score_value += 1
+                # if display.score_value <= grand_num_of_enemies-1:
+                display.score_value += 1
                 enemy_obj_list[count].alive = False
 
         enemy_obj_list[count].draw()
@@ -132,7 +151,27 @@ while running:
     count = 0
 
     if not enemy_obj_list:
-        display.game_over_text()
+
+        fast_powerup = True
+
+        if grand_num_of_enemies < 15:
+            grand_num_of_enemies += 2
+            num_of_enemies = grand_num_of_enemies
+            print("spawn")
+            spawn_enemies()
+        else:
+            display.game_over_text()
+
+    if fast_powerup:
+        
+        powerup.spawn_fast_powerup()
+
+        if powerup.fast_powerup(playerX, playerY):
+
+            player.player_x_change = 2
+            player.player_y_change = 2
+            fast_powerup = False
+            powerup.respawn_fast_powerup()
 
     display.show_score()
     pygame.display.update()
